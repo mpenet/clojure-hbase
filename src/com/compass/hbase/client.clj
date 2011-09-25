@@ -169,42 +169,42 @@
 ;; (c/define-schema :items [:defaults [:keyword :long]
 ;;                        :row-type :integer]
 ;;    :counters [:keyword :long])
-;; (client/incr :items 100 {:counters {:downvote -2 upvote: 1}})
+;; (client/increment :items 100 {:counters {:downvote -2 upvote: 1}})
 ;; =========================================
 
-(defn- incr-add [#^Increment incr schema family col value]
-  (.addColumn incr
+(defn- increment-add [#^Increment increment schema family col value]
+  (.addColumn increment
               (encode-family schema family)
               (encode-column schema family col)
               (long value)))
 
-(defn make-incr [schema row values]
+(defn make-increment [schema row values]
   (let [rowbytes (encode-row schema row)
-        incr (new Increment rowbytes)]
+        increment (new Increment rowbytes)]
     (if (map? values)
       (doseq [[family cols] values]
         (doseq [[col value] cols]
-          (incr-add incr schema family col value)))
+          (increment-add increment schema family col value)))
       (doseq [[family col value] values]
-        (incr-add incr schema family col value)))
-    incr))
+        (increment-add increment schema family col value)))
+    increment))
 
-(defn incr
-  "Incr data into a row using a value map or a vector sequence:
+(defn increment
+  "Increment data into a row using a value map or a vector sequence:
    of vectors.  Value maps are {:family {:column value :column value}}
-   and vector inincrs are [[family column value] [family column value]]"
+   and vector in increment are [[family column value] [family column value]]"
   ([table row values constraints]
      (with-table [table table]
        (let [schema (table-schema table)
-             i (make-incr schema row values)]
+             i (make-increment schema row values)]
          (io! (if (:all-versions constraints)
                 (decode-all schema (.increment table i))
                 (decode-latest schema (.increment table i)))))))
   ([table row values]
-     (incr table row values nil)))
+     (increment table row values nil)))
 
-(defn incr-one [table row family column value]
-  (incr table row [[family column value]]))
+(defn increment-one [table row family column value]
+  (increment table row [[family column value]]))
 
 ;; =========================================
 ;; Multi Row Get / Put operations

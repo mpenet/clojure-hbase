@@ -43,9 +43,9 @@ map consists of the keys and values for that family.
     (client/put :users 100 {:userinfo {:name "Test User" :id "21412"} :votes {:up 2 :down 4}})
     (client/get :users 100) => {:userinfo {:name "Test User" :id "21412"} :votes {:up 2 :down 4}}
 
-Incr only returns the modified fields othewise it works the same as put.
+Increment only returns the modified fields othewise it works the same as put.
 
-    (client/incr :users 100 {:votes {:up 1 :down -2}}) => [100 {:votes {:up 3, :down 2}}]
+    (client/increment :users 100 {:votes {:up 1 :down -2}}) => [100 {:votes {:up 3, :down 2}}]
 
 Additional commands are straightforward
 
